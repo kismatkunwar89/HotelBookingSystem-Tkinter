@@ -1,18 +1,20 @@
 from tkinter import *
+
 from tkinter import ttk
 from tkinter import messagebox
 import model
-
-
+import backend.database
+import model.model
+from tkcalendar import Calendar, DateEntry
 
 class Movie:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("1000x820")
+        self.root.geometry("1200x820")
         self.root.title("Online Hotel Booking System")
         root.resizable(False, False)
         self.root.config(bg="orange")
-
+        self.db=backend.database.DBConnect()
 
         self.name = StringVar()
         self.email = StringVar()
@@ -34,7 +36,7 @@ class Movie:
 
         frm1 = LabelFrame(self.root, text="Costumer Details", font=("times new roman", 17, "bold"),
                           fg="black", bg="powder blue")
-        frm1.place(x=3, y=96, width=993, height=125)
+        frm1.place(x=3, y=96, width=1183, height=125)
 
         f_name = Label(frm1, text="Full Name:", fg="Black", font=("times new roman", 19, "bold"))
         f_name.grid(row=1, column=0, pady=10, padx=20, sticky="w")
@@ -51,7 +53,7 @@ class Movie:
         e_address = Label(frm1, text="Email Address:", fg="black", font=("times new roman", 19, "bold"))
         e_address.place(x=655, y=10)
 
-        self.entry_e = Entry(frm1, textvariable=self.email, font=("times new roman", 16, "bold"), relief=GROOVE)
+        self.entry_e = Entry(frm1, textvariable=self.email, font=("times new roman", 16, "bold"), relief=GROOVE,width=30)
         self.entry_e.place(x=800, y=10)
 
         Gender = Label(frm1, text="Gender", fg="black", font=("times new roman", 19, "bold"))
@@ -71,8 +73,17 @@ class Movie:
         r_number = Label(frm1, text=" Room Number :", fg="black", font=("times new roman", 19, "bold"))
         r_number.place(x=612, y=55)
 
-        self.rno_entry = Entry(frm1, textvariable=self.roomnumber, font=("times new roman", 16, "bold"), relief=GROOVE)
+        self.rno_entry = Entry(frm1, textvariable=self.roomnumber, font=("times new roman", 16, "bold"), relief=GROOVE,width=7)
         self.rno_entry.place(x=762, y=55)
+
+        date = Label(frm1, text=" Date :", fg="black",font=("times new roman", 19, "bold"))
+        date.place(x=837, y=55)
+
+        self.cal_entry = DateEntry(frm1,width=12, background='darkblue',
+                        foreground='white', borderwidth=10)
+        self.cal_entry.place(x=910,y=57)
+        self.cal_button=Button(frm1,text="OK",font=('times new roman', 15, 'bold'),width=4,bg="orange",command=self.print_sel)
+        self.cal_button.place(x=1050,y=55)
 
         BFrame = Frame(MainFrame, bd=2, width=1344, height=70, padx=18, pady=10, bg="orange", relief=RIDGE)
         BFrame.place(x=4, y=222)
@@ -93,22 +104,24 @@ class Movie:
                              command=self.deletedata)
         self.btndel.grid(row=0, column=3)
 
-        sFrame = Frame(MainFrame, bd=2, width=300, height=60, padx=18, pady=10, bg="orange", relief=RIDGE)
+        sFrame = Frame(MainFrame, bd=2, width=538, height=60, padx=18, pady=10, bg="orange", relief=RIDGE)
         sFrame.place(x=650, y=222)
 
         # sort
+        sort_by = Label(sFrame, text=" Sort By :", fg="black", font=("times new roman", 19, "bold"))
+        sort_by.place(x=3, y=1)
 
         self.bsort = Button(sFrame, text=" Sort ", fg="black", font=("times new roman", 18, "bold"),
                             command=self.sorted)
-        self.bsort.place(x=190, y=1)
+        self.bsort.place(x=275, y=1)
 
         self.combo_sort = ttk.Combobox(sFrame, textvariable=self.sort, font=("times new roman", 19, "bold"),
                                        state='readonly', width=15)
         self.combo_sort['values'] = ("RoomNo")
-        self.combo_sort.place(x=3, y=1)
+        self.combo_sort.place(x=93, y=1)
 
         Detail_Frame = Frame(self.root, bd=4, relief=RIDGE, bg="powderblue")
-        Detail_Frame.place(x=5, y=289, width=990, height=530)
+        Detail_Frame.place(x=5, y=289, width=1185, height=530)
 
         lbl_search = Label(Detail_Frame, text="Search By", bg="powderblue", fg="black",
                            font=("times new roman", 20, "bold"))
@@ -131,12 +144,12 @@ class Movie:
                                                                                                                 pady=10)
 
         Table_Frame = Frame(Detail_Frame, bd=4, relief=RIDGE, bg="black")
-        Table_Frame.place(x=10, y=70, width=965, height=450)
+        Table_Frame.place(x=10, y=70, width=1165, height=450)
 
         scroll_x = Scrollbar(Table_Frame, orient=HORIZONTAL)
         scroll_y = Scrollbar(Table_Frame, orient=VERTICAL)
         self.hotel_table = ttk.Treeview(Table_Frame,
-                                        columns=("name", "address", "email", "gender", "number", "RoomNumber"),
+                                        columns=("name", "address", "email", "gender", "number", "RoomNumber","Date"),
                                         xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set)
         scroll_x.pack(side=BOTTOM, fill=X)
         scroll_y.pack(side=RIGHT, fill=Y)
@@ -149,6 +162,7 @@ class Movie:
         self.hotel_table.heading("gender", text="Gender")
         self.hotel_table.heading("number", text="Phone number")
         self.hotel_table.heading("RoomNumber", text="Room Number")
+        self.hotel_table.heading("Date", text="Date")
         self.hotel_table['show'] = 'headings'
 
         self.hotel_table.column("name", width=100)
@@ -156,6 +170,7 @@ class Movie:
         self.hotel_table.column("email", width=100)
         self.hotel_table.column("gender", width=100)
         self.hotel_table.column("number", width=100)
+        self.hotel_table.column("Date", width=100)
         self.hotel_table.pack(fill=BOTH, expand=1)
 
         self.fetch_data()
@@ -165,25 +180,98 @@ class Movie:
         pass
 
     def get_cursor(self, ev):
-        pass
+        curosor_row = self.hotel_table.focus()
+        contents = self.hotel_table.item(curosor_row)
+        row = contents['values']
+        self.name.set(row[0])
+        self.email.set(row[2])
+        self.gender.set(row[3])
+        self.contact.set(row[4])
+        self.address.set(row[1])
+        self.roomnumber.set(row[5])
 
     def fetch_data(self):
-        pass
+        query = ("select * from new_table")
+
+        rows = self.db.select(query)
+        if len(rows) != 0:
+            self.hotel_table.delete(*self.hotel_table.get_children())
+            for row in rows:
+                self.hotel_table.insert('', END, values=row)
 
     def adddata(self):
-        pass
+        name = self.ef_name.get()
+        address = self.e_address.get()
+        email = self.entry_e.get()
+        gender = self.combo_gender.get()
+        phone_number = self.e_Contact.get()
+        room_number = self.rno_entry.get()
+        date = self.cal_entry.get()
+        # gender=self.cmb_gender.current()
+        if name == '' or address == '' or email == '' or gender == '' or phone_number == '' or room_number == '' or date == '':
+            messagebox.showerror('Error', 'plz fill the empty field')
+            return
+
+        md = model.model.User(name, address, email, gender, phone_number, room_number, date)
+        query = "insert into new_table(name,phone_number,email,gender,address,room_number,date) values(%s,%s,%s,%s,%s,%s,%s)"
+        values = (
+        md.get_username(), md.get_pno(), md.get_email(), md.get_gender(), md.get_address(), md.get_rno(), md.get_date())
+
+        self.db.insert(query, values)
+
+        self.fetch_data()
+        self.clear()
+
+        query = ("select * from new_table")
+
+        rows = self.db.select(query)
+        messagebox.showinfo("congratulations", " number added succesfully")
+
 
     def clear(self):
-        pass
+        self.name.set("")
+        self.email.set("")
+        self.gender.set("")
+        self.contact.set("")
+        self.address.set("")
+        self.roomnumber.set("")
 
     def clcdata(self):
         pass
 
     def deletedata(self):
-        pass
+        name = self.ef_name.get()
+        if (name == ""):
+            messagebox.showinfo("Delete Status", "ID os compolsary for delete")
+        else:
+            query = "delete from new_table where name=%s"
+            value = (name,)
+            self.db.delete(query, value)
+            messagebox.showinfo("Delete Status", "Deleted Succesfuly")
+            self.clear()
+            self.fetch_data()
 
     def updata(self):
-        pass
+        name = self.ef_name.get()
+        address = self.e_address.get()
+        email = self.entry_e.get()
+        gender = self.combo_gender.get()
+        phone_number = self.e_Contact.get()
+        room_number = self.rno_entry.get()
+        date = self.cal_entry.get()
+        if name == '' or address == '' or email == '' or gender == '' or phone_number == '' or room_number == '' or date == '':
+            messagebox.showerror('Error', 'plz fill the empty field')
+
+        else:
+            md = model.model.User(name, address, email, gender, phone_number, room_number, date)
+            query = "update new_table set address=%s, email=%s, gender=%s, phone_number=%s, room_number=%s,date=%s where name=%s "
+            values = (md.get_address(), md.get_email(), md.get_gender(), md.get_pno(), md.get_rno(), md.get_date(),
+                      md.get_username())
+            self.db.update(query, values)
+            self.fetch_data()
+            self.clear()
+
+            messagebox.showinfo("Update status", "Update Succesfuly")
 
     def mergesort(self):
         pass
@@ -200,8 +288,17 @@ class Movie:
     def btnclc(self):
         pass
 
+    def print_sel(self):
+        print(self.cal_entry.get())
 
-if __name__ == '__main__':
-    root = Tk()
-    datbase = Movie(root)
-    root.mainloop()
+
+
+
+if __name__=='__main__':
+	root=Tk()
+	datbase=Movie(root)
+	root.mainloop()
+
+
+
+
