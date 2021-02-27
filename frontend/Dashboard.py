@@ -129,7 +129,7 @@ class Movie:
 
         combo_search = ttk.Combobox(Detail_Frame, textvariable=self.search_by, font=("times new roman", 18, "bold"),
                                     state='readonly')
-        combo_search['values'] = ("Name", "Room Number")
+        combo_search['values'] = ( "Room Number", "Phone Number")
         combo_search.grid(row=0, column=1)
 
         txt_search = Entry(Detail_Frame, textvariable=self.search_txt, font=("times new roman", 17, "bold"),
@@ -138,7 +138,7 @@ class Movie:
 
         self.searchbtn = Button(Detail_Frame, text="Search ", bg="orange", fg="black", width=16, pady=5,
                                 command=self.search_data).grid(row=0, column=3, padx=10, pady=10)
-        self.showallbtn = Button(Detail_Frame, text="Show All", bg="orange", fg="black", width=16, pady=5).grid(row=0,
+        self.showallbtn = Button(Detail_Frame, text="Show All",command=self.show_data, bg="orange", fg="black", width=16, pady=5).grid(row=0,
                                                                                                                 column=4,
                                                                                                                 padx=10,
                                                                                                                 pady=10)
@@ -176,6 +176,9 @@ class Movie:
         self.fetch_data()
         self.hotel_table.bind("<ButtonRelease-1>", self.get_cursor)
 
+
+
+
     def sorted(self):
         pass
 
@@ -189,6 +192,9 @@ class Movie:
         self.contact.set(row[4])
         self.address.set(row[1])
         self.roomnumber.set(row[5])
+
+    def show_data(self):
+        self.fetch_data()
 
     def fetch_data(self):
         query = ("select * from new_table")
@@ -273,17 +279,103 @@ class Movie:
 
             messagebox.showinfo("Update status", "Update Succesfuly")
 
-    def mergesort(self):
-        pass
+    def mergesort(self, alist):
+        if len(alist) > 1:
+            mid = len(alist) // 2
+            lefthalf = alist[:mid]
+            righthalf = alist[mid:]
+            self.mergesort(lefthalf)
+            self.mergesort(righthalf)
+            i = 0
+            j = 0
+            k = 0
+            while i < len(lefthalf) and j < len(righthalf):
+                if lefthalf[i] < righthalf[j]:
+                    alist[k] = lefthalf[i]
+                    i = i + 1
+                else:
+                    alist[k] = righthalf[j]
+                    j += 1
+                k += 1
+            while i < len(lefthalf):
+                alist[k] = lefthalf[i]
+                i += 1
+                k += 1
+            while j < len(righthalf):
+                alist[k] = righthalf[j]
+                j += 1
+                k += 1
+        return alist
 
-    def binary_search_name(self):
-        pass
-
-    def binary_room_number(self):
-        pass
+    def binary_room_number(self, list, item):
+        if list == []:
+            return ValueError
+        self.list = list
+        self.item = item
+        max = len(list) - 1
+        min = 0
+        while min <= max:
+            mid = (min + max) // 2
+            if self.list[mid] == self.item:
+                return mid
+            elif self.list[mid] > self.item:
+                max = mid - 1
+            else:
+                min = mid + 1
+        return -1
 
     def search_data(self):
-        pass
+        if self.search_by.get()=="Room Number":
+            query = "select * from new_table"
+            rows = self.db.select(query)
+            myStack = []
+            for row in rows:
+                myStack.append(row[5])
+            self.sorted = self.mergesort(myStack)
+            item = int(self.search_txt.get())
+            sorted = self.sorted
+            index = self.binary_room_number(sorted, item)
+            for row in rows:
+                if sorted[index] == row[5]:
+                    self.hotel_table.delete(*self.hotel_table.get_children())
+                    self.hotel_table.insert('', END, value=row)
+                    self.search_txt.set("")
+
+        elif self.search_by.get() == "Phone Number":
+            query = "select * from new_table"
+            rows = self.db.select(query)
+            myStack = []
+            for row in rows:
+                myStack.append(row[4])
+            self.sorted = self.mergesort(myStack)
+            item = int(self.search_txt.get())
+            sorted = self.sorted
+            index = self.binary_search_phone(sorted, item)
+            for row in rows:
+                if sorted[index] == row[4]:
+                    self.hotel_table.delete(*self.hotel_table.get_children())
+                    self.hotel_table.insert('', END, value=row)
+                    self.search_txt.set("")
+
+    def binary_search_phone(self, list, item):
+        if list == []:
+            return ValueError
+        self.list = list
+        self.item = item
+        max = len(list) - 1
+        min = 0
+        while min <= max:
+            mid = (min + max) // 2
+            if self.list[mid] == self.item:
+                return mid
+            elif self.list[mid] > self.item:
+                max = mid - 1
+            else:
+                min = mid + 1
+        return -1
+
+
+
 
     def btnclc(self):
         pass

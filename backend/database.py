@@ -18,7 +18,13 @@ class DBConnect:
         self.cur.execute(query,value)
         self.con.commit()
 
+    def search(self, qry):
+        self.cur.execute(qry)
+        return self.cur.fetchall()
+
 
     def delete(self,query,value):
         self.cur.execute(query,value)
         self.con.commit()
+
+
