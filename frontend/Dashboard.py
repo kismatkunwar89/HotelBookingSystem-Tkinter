@@ -82,8 +82,7 @@ class Movie:
         self.cal_entry = DateEntry(frm1,width=12, background='darkblue',
                         foreground='white', borderwidth=10)
         self.cal_entry.place(x=910,y=57)
-        self.cal_button=Button(frm1,text="OK",font=('times new roman', 15, 'bold'),width=4,bg="orange",command=self.print_sel)
-        self.cal_button.place(x=1050,y=55)
+
 
         BFrame = Frame(MainFrame, bd=2, width=1344, height=70, padx=18, pady=10, bg="orange", relief=RIDGE)
         BFrame.place(x=4, y=222)
