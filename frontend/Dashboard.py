@@ -116,7 +116,7 @@ class Movie:
 
         self.combo_sort = ttk.Combobox(sFrame, textvariable=self.sort, font=("times new roman", 19, "bold"),
                                        state='readonly', width=15)
-        self.combo_sort['values'] = ("RoomNo")
+        self.combo_sort['values'] = ("Name","RoomNumber")
         self.combo_sort.place(x=93, y=1)
 
         Detail_Frame = Frame(self.root, bd=4, relief=RIDGE, bg="powderblue")
@@ -175,11 +175,35 @@ class Movie:
         self.fetch_data()
         self.hotel_table.bind("<ButtonRelease-1>", self.get_cursor)
 
-
-
-
     def sorted(self):
-        pass
+        query = ("select * from new_table")
+        rows = self.db.select(query)
+        myStack = []
+        if len(rows) != 0:
+            self.hotel_table.delete(*self.hotel_table.get_children())
+            if self.sort.get() == "Name":
+                for row in rows:
+                    myStack.append(row[0])
+                self.sorted = self.mergesort(myStack)
+
+                for i in self.sorted:
+                    for row in rows:
+                        if i == row[0]:
+                            self.hotel_table.insert('', END, value=row)
+                            rows.remove(row)
+            else:
+                self.hotel_table.delete(*self.hotel_table.get_children())
+                if self.sort.get() == "RoomNumber":
+                    for row in rows:
+                        myStack.append(row[5])
+                    self.sorted = self.mergesort(myStack)
+
+                    for i in self.sorted:
+                        for row in rows:
+                            if i == row[5]:
+                                self.hotel_table.insert('', END, value=row)
+                                rows.remove(row)
+
 
     def get_cursor(self, ev):
         curosor_row = self.hotel_table.focus()
@@ -269,9 +293,9 @@ class Movie:
 
         else:
             md = model.model.User(name, address, email, gender, phone_number, room_number, date)
-            query = "update new_table set address=%s, email=%s, gender=%s, phone_number=%s, room_number=%s,date=%s where name=%s "
-            values = (md.get_address(), md.get_email(), md.get_gender(), md.get_pno(), md.get_rno(), md.get_date(),
-                      md.get_username())
+            query = "update new_table set name=%s,address=%s, email=%s, gender=%s, phone_number=%s, date=%s where room_number=%s"
+            values = (md.get_username(),md.get_address(), md.get_email(), md.get_gender(), md.get_pno(), md.get_date(),
+                      md.get_rno())
             self.db.update(query, values)
             self.fetch_data()
             self.clear()
