@@ -6,6 +6,7 @@ import model
 import backend.database
 import model.model
 from tkcalendar import Calendar, DateEntry
+import mysql.connector
 
 class Movie:
     def __init__(self, root):
@@ -26,7 +27,8 @@ class Movie:
         self.sort = StringVar()
         self.search_by = StringVar()
 
-        # Frames
+
+
         MainFrame = Frame(self.root, bg="light grey", width=1350, height=750)
         MainFrame.grid()
 
@@ -142,6 +144,12 @@ class Movie:
                                                                                                                 padx=10,
                                                                                                                 pady=10)
 
+        self.showallbtn = Button(Detail_Frame, text="Exit", command=self.Exit, bg="orange", fg="black",
+                                width=16, pady=5).grid(row=0,
+                                                       column=6,
+                                                       padx=10,
+                                                       pady=10)
+
         Table_Frame = Frame(Detail_Frame, bd=4, relief=RIDGE, bg="black")
         Table_Frame.place(x=10, y=70, width=1165, height=450)
 
@@ -174,6 +182,14 @@ class Movie:
 
         self.fetch_data()
         self.hotel_table.bind("<ButtonRelease-1>", self.get_cursor)
+
+    def Exit(self):
+        Exit = messagebox.askyesno("Confirm if you want to exit!")
+        if Exit > 0:
+            self.root.destroy()
+            return
+
+
 
     def sorted(self):
         query = ("select * from new_table")
@@ -237,24 +253,27 @@ class Movie:
         room_number = self.rno_entry.get()
         date = self.cal_entry.get()
         # gender=self.cmb_gender.current()
-        if name == '' or address == '' or email == '' or gender == '' or phone_number == '' or room_number == '' or date == '':
-            messagebox.showerror('Error', 'plz fill the empty field')
-            return
 
-        md = model.model.User(name, address, email, gender, phone_number, room_number, date)
-        query = "insert into new_table(name,phone_number,email,gender,address,room_number,date) values(%s,%s,%s,%s,%s,%s,%s)"
-        values = (
-        md.get_username(), md.get_pno(), md.get_email(), md.get_gender(), md.get_address(), md.get_rno(), md.get_date())
+        try:
+            if name == '' or address == '' or email == '' or gender == '' or phone_number == '' or room_number == '' or date == '':
+                messagebox.showerror('Error', 'plz fill the empty field')
+                return
+            md = model.model.User(name, address, email, gender, phone_number, room_number, date)
+            query = "insert into new_table(name,phone_number,email,gender,address,room_number,date) values(%s,%s,%s,%s,%s,%s,%s)"
+            values = (
+            md.get_username(), md.get_pno(), md.get_email(), md.get_gender(), md.get_address(), md.get_rno(), md.get_date())
 
-        self.db.insert(query, values)
+            self.db.insert(query, values)
 
-        self.fetch_data()
-        self.clear()
+            self.fetch_data()
+            self.clear()
 
-        query = ("select * from new_table")
+            query = ("select * from new_table")
 
-        rows = self.db.select(query)
-        messagebox.showinfo("congratulations", " number added succesfully")
+            rows = self.db.select(query)
+            messagebox.showinfo("congratulations", " number added succesfully")
+        except mysql.connector.IntegrityError :
+            messagebox.showinfo("RoomBooked","Room already booked, Please choose another room number")
 
 
     def clear(self):
@@ -265,8 +284,6 @@ class Movie:
         self.address.set("")
         self.roomnumber.set("")
 
-    def clcdata(self):
-        pass
 
     def deletedata(self):
         name = self.ef_name.get()
@@ -301,7 +318,7 @@ class Movie:
             self.clear()
 
             messagebox.showinfo("Update status", "Update Succesfuly")
-
+    @classmethod
     def mergesort(self, alist):
         if len(alist) > 1:
             mid = len(alist) // 2
@@ -329,7 +346,7 @@ class Movie:
                 j += 1
                 k += 1
         return alist
-
+    @classmethod
     def binary_room_number(self, list, item):
         if list == []:
             return ValueError
@@ -379,7 +396,7 @@ class Movie:
                     self.hotel_table.delete(*self.hotel_table.get_children())
                     self.hotel_table.insert('', END, value=row)
                     self.search_txt.set("")
-
+    @classmethod
     def binary_search_phone(self, list, item):
         if list == []:
             return ValueError
@@ -396,17 +413,6 @@ class Movie:
             else:
                 min = mid + 1
         return -1
-
-
-
-
-    def btnclc(self):
-        pass
-
-    def print_sel(self):
-        print(self.cal_entry.get())
-
-
 
 
 if __name__=='__main__':

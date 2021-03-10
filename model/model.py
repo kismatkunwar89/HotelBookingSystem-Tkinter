@@ -8,6 +8,7 @@ class User:
         self.__rno=roomno
         self.__date=date
 
+
     def set_username(self,uname):
         self.__username=uname
 
@@ -32,16 +33,19 @@ class User:
     def get_gender(self):
         return self.__gen
 
+    @classmethod
     def set_pno(self,phoneno):
         self.__pno = phoneno
 
+    @classmethod
     def get_pno(self):
         return self.__pno
 
-
+    @classmethod
     def set_rno(self, roomno):
         self.__rno = roomno
 
+    @classmethod
     def get_rno(self):
         return self.__rno
 

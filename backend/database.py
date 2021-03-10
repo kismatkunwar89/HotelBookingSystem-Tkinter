@@ -2,7 +2,7 @@ import mysql.connector as ms
 class DBConnect:
     def __init__(self):
         self.con=ms.connect(host='localhost',user='root',password='unostamsik',\
-                            database='softwarica')
+                            database='softwarica_hotel')
         self.cur=self.con.cursor()
 
     def insert(self,query,values):
@@ -27,4 +27,8 @@ class DBConnect:
         self.cur.execute(query,value)
         self.con.commit()
 
-
+    def view(self, query, values=""):
+        self.query = query
+        self.values = values
+        self.cur.execute(self.query, self.values)
+        return self.cur.fetchall()
