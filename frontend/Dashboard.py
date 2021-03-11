@@ -458,13 +458,13 @@ class Movie:
             rows = self.db.select(query)
             myStack = []
             for row in rows:
-                myStack.append(row[4])
+                myStack.append(row[1])
             self.sorted = self.mergesort(myStack)
             item = int(self.search_txt.get())
             sorted = self.sorted
             index = self.binary_search_phone(sorted, item)
             for row in rows:
-                if sorted[index] == row[4]:
+                if sorted[index] == row[1]:
                     self.hotel_table.delete(*self.hotel_table.get_children())
                     self.hotel_table.insert('', END, value=row)
                     self.search_txt.set("")
