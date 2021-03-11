@@ -10,6 +10,9 @@ import mysql.connector
 
 class Movie:
     def __init__(self, root):
+        """
+                                Function to configure root window
+                """
         self.root = root
         self.root.geometry("1200x820")
         self.root.title("Online Hotel Booking System")
@@ -156,7 +159,7 @@ class Movie:
         scroll_x = Scrollbar(Table_Frame, orient=HORIZONTAL)
         scroll_y = Scrollbar(Table_Frame, orient=VERTICAL)
         self.hotel_table = ttk.Treeview(Table_Frame,
-                                        columns=("name", "address", "email", "gender", "number", "RoomNumber","Date"),
+                                        columns=("name", "number", "email", "gender","address", "RoomNumber","Date"),
                                         xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set)
         scroll_x.pack(side=BOTTOM, fill=X)
         scroll_y.pack(side=RIGHT, fill=Y)
@@ -184,6 +187,13 @@ class Movie:
         self.hotel_table.bind("<ButtonRelease-1>", self.get_cursor)
 
     def Exit(self):
+
+        """
+         Function to exit window
+
+        """
+
+
         Exit = messagebox.askyesno("Confirm if you want to exit!")
         if Exit > 0:
             self.root.destroy()
@@ -192,6 +202,8 @@ class Movie:
 
 
     def sorted(self):
+
+
         query = ("select * from new_table")
         rows = self.db.select(query)
         myStack = []
@@ -201,6 +213,7 @@ class Movie:
                 for row in rows:
                     myStack.append(row[0])
                 self.sorted = self.mergesort(myStack)
+
 
                 for i in self.sorted:
                     for row in rows:
@@ -222,20 +235,36 @@ class Movie:
 
 
     def get_cursor(self, ev):
+        """
+                 Function to select values from table to entries
+
+                """
         curosor_row = self.hotel_table.focus()
         contents = self.hotel_table.item(curosor_row)
         row = contents['values']
         self.name.set(row[0])
         self.email.set(row[2])
         self.gender.set(row[3])
-        self.contact.set(row[4])
-        self.address.set(row[1])
+        self.contact.set(row[1])
+        self.address.set(row[4])
         self.roomnumber.set(row[5])
 
     def show_data(self):
+        """
+                            Function to show all the data from new_table to hotel_table
+                                        hotel_table= table made in GUI
+                                        new_table= table made in database
+
+                                       """
         self.fetch_data()
 
     def fetch_data(self):
+        """
+                                        Function to fetch data from new_table to hotel_table
+                                        hotel_table= table made in GUI
+                                        new_table= table made in database
+
+                                """
         query = ("select * from new_table")
 
         rows = self.db.select(query)
@@ -245,6 +274,11 @@ class Movie:
                 self.hotel_table.insert('', END, values=row)
 
     def adddata(self):
+        """
+                                Function to  add data to new_table after pressing Add button
+                                 new_table= table made in database
+
+                """
         name = self.ef_name.get()
         address = self.e_address.get()
         email = self.entry_e.get()
@@ -252,7 +286,7 @@ class Movie:
         phone_number = self.e_Contact.get()
         room_number = self.rno_entry.get()
         date = self.cal_entry.get()
-        # gender=self.cmb_gender.current()
+
 
         try:
             if name == '' or address == '' or email == '' or gender == '' or phone_number == '' or room_number == '' or date == '':
@@ -277,6 +311,10 @@ class Movie:
 
 
     def clear(self):
+
+        """
+                        Function to clear all value from all Entry Boxes.
+                """
         self.name.set("")
         self.email.set("")
         self.gender.set("")
@@ -286,6 +324,11 @@ class Movie:
 
 
     def deletedata(self):
+        """
+                                        Function to delete data in new_table
+                                        new_table= table made in database
+
+                                """
         name = self.ef_name.get()
         if (name == ""):
             messagebox.showinfo("Delete Status", "ID os compolsary for delete")
@@ -298,6 +341,10 @@ class Movie:
             self.fetch_data()
 
     def updata(self):
+        """
+                                Function to update data in new_table
+                                new_table= table made in database
+                        """
         name = self.ef_name.get()
         address = self.e_address.get()
         email = self.entry_e.get()
@@ -320,6 +367,13 @@ class Movie:
             messagebox.showinfo("Update status", "Update Succesfuly")
     @classmethod
     def mergesort(self, alist):
+        """
+                        Function to perform merge sort:
+                        :param alist:list of specific entries of hotelcostumer
+                        :type alist:list
+                        :return: alist
+                        :rtype: list
+                """
         if len(alist) > 1:
             mid = len(alist) // 2
             lefthalf = alist[:mid]
@@ -348,6 +402,16 @@ class Movie:
         return alist
     @classmethod
     def binary_room_number(self, list, item):
+        """
+                        Function to perform binary search:
+                        :param list:list of room number
+                        :type list:list
+                        :param item:specification of  room number
+                        :type item:int
+                        :return: True
+                        :return: False
+                        :rtype: bool
+                """
         if list == []:
             return ValueError
         self.list = list
@@ -365,6 +429,13 @@ class Movie:
         return -1
 
     def search_data(self):
+        """
+                                Function to search according to Room Number or Phone Number
+                                using perform binary search:
+
+                        """
+
+
         if self.search_by.get()=="Room Number":
             query = "select * from new_table"
             rows = self.db.select(query)
@@ -374,6 +445,7 @@ class Movie:
             self.sorted = self.mergesort(myStack)
             item = int(self.search_txt.get())
             sorted = self.sorted
+            print(sorted)
             index = self.binary_room_number(sorted, item)
             for row in rows:
                 if sorted[index] == row[5]:
@@ -398,6 +470,16 @@ class Movie:
                     self.search_txt.set("")
     @classmethod
     def binary_search_phone(self, list, item):
+        """
+                                Function to perform binary search:
+                                :param list:list of phonenumber
+                                :type list:list
+                                :param item:specification of phone number
+                                :type item:int
+                                :return: True
+                                :return: False
+                                :rtype: bool
+                        """
         if list == []:
             return ValueError
         self.list = list

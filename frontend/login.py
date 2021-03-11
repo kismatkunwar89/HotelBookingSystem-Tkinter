@@ -7,6 +7,9 @@ import Dashboard
 
 class Login_Page:
     def __init__(self, root):
+        """
+                        Function to configure root window
+                """
         self.root = root
         self.root.configure(bg='grey')
         self.root.title(' Hotel Login Page')
@@ -56,6 +59,9 @@ class Login_Page:
         btn_reset.place(x=250, y=120)
 
     def btn_reset_click(self):
+        """
+                        Function to delete all value from all Entry Boxes.
+                """
         self.ent_username.delete(0, END)
         self.ent_username.insert(0, "")
 
@@ -63,6 +69,9 @@ class Login_Page:
         self.ent_password.insert(0, '')
 
     def button_login(self, username, password):
+        """
+                        Function to open new window  or show error .
+                """
         if len(username) != 0 and len(password) != 0:
             if username == "admin" and password == "admin":
                 messagebox.showinfo('Success', 'Congratulations!! login successfull')
